@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CareerAI - AI Career Roadmapper</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,Arial,sans-serif;
+    background:#070b16;
+    color:#f5f7ff;
+}
+
+button,
+input,
+textarea,
+select{
+    font-family:inherit;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    background:rgba(91,80,255,.12);
+    filter:blur(120px);
+    top:-200px;
+    left:-150px;
+    pointer-events:none;
+}
+
+.navbar{
+    height:72px;
+    padding:0 6%;
+    border-bottom:1px solid #252e45;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(7,11,22,.92);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:21px;
+    font-weight:800;
+}
+
+.logo-icon{
+    width:40px;
+    height:40px;
+    border-radius:11px;
+    background:linear-gradient(135deg,#635bff,#3bbcff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+}
+
+.ai-badge{
+    padding:8px 13px;
+    border:1px solid #303a55;
+    border-radius:30px;
+    color:#a9b4cd;
+    font-size:13px;
+}
+
+.hero{
+    text-align:center;
+    max-width:900px;
+    margin:75px auto 50px;
+    padding:0 20px;
+}
+
+.hero-badge{
+    display:inline-block;
+    padding:8px 15px;
+    border-radius:30px;
+    background:rgba(99,91,255,.1);
+    border:1px solid rgba(99,91,255,.3);
+    color:#aaa5ff;
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:.05em;
+}
+
+.hero h1{
+    font-size:clamp(42px,6vw,72px);
+    line-height:1.05;
+    margin:22px 0;
+    letter-spacing:-3px;
+}
+
+.gradient{
+    background:linear-gradient(90deg,#8278ff,#35d7ff);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.hero p{
+    color:#8995af;
+    font-size:17px;
+    line-height:1.7;
+    max-width:680px;
+    margin:auto;
+}
+
+.container{
+    width:92%;
+    max-width:1100px;
+    margin:auto;
+}
+
+.input-card{
+    padding:32px;
+    border:1px solid #29334c;
+    border-radius:20px;
+    background:#101728;
+    box-shadow:0 25px 70px rgba(0,0,0,.3);
+}
+
+.card-title{
+    display:flex;
+    gap:13px;
+    margin-bottom:25px;
+}
+
+.card-title-icon{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    background:#1d2550;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.card-title h2{
+    font-size:20px;
+}
+
+.card-title p{
+    color:#78849d;
+    margin-top:4px;
+    font-size:14px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.form-group label{
+    color:#8995ad;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    background:#080d19;
+    border:1px solid #303b56;
+    color:white;
+    border-radius:10px;
+    padding:14px;
+    outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color:#635bff;
+}
+
+.form-group textarea{
+    resize:vertical;
+}
+
+.generate{
+    width:100%;
+    margin-top:25px;
+    padding:16px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(90deg,#635bff,#438cff);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.generate:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 30px rgba(79,70,229,.25);
+}
+
+.loading{
+    display:none;
+    text-align:center;
+    padding:30px;
+    color:#a6b1c9;
+}
+
+.spinner{
+    width:35px;
+    height:35px;
+    border:3px solid #303a55;
+    border-top-color:#6b63ff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin:0 auto 15px;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+#roadmap{
+    display:none;
+    margin-top:60px;
+    margin-bottom:80px;
+}
+
+.roadmap-header{
+    padding:30px;
+    border:1px solid #29334c;
+    border-radius:18px;
+    background:#101728;
+    display:flex;
+    justify-content:space-between;
+    gap:25px;
+}
+
+.ai-label{
+    color:#918aff;
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:.1em;
+}
+
+.roadmap-header h2{
+    font-size:32px;
+    margin:10px 0;
+}
+
+.roadmap-header p{
+    color:#8f9ab2;
+    line-height:1.6;
+}
+
+.duration{
+    min-width:190px;
+    padding:18px;
+    background:#090e1a;
+    border:1px solid #29334c;
+    border-radius:12px;
+}
+
+.duration small{
+    display:block;
+    color:#707c96;
+    font-size:10px;
+}
+
+.duration strong{
+    display:block;
+    margin-top:7px;
+    font-size:22px;
+}
+
+.section{
+    margin-top:20px;
+    padding:25px;
+    background:#101728;
+    border:1px solid #29334c;
+    border-radius:16px;
+}
+
+.section h3{
+    margin-bottom:18px;
+}
+
+.roles{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.role{
+    padding:9px 14px;
+    background:#19223b;
+    border:1px solid #303b56;
+    border-radius:30px;
+    color:#bdc7dc;
+    font-size:13px;
+}
+
+.timeline{
+    position:relative;
+    margin-top:45px;
+}
+
+.timeline::before{
+    content:"";
+    position:absolute;
+    left:22px;
+    top:0;
+    bottom:0;
+    width:2px;
+    background:#29334c;
+}
+
+.phase{
+    position:relative;
+    padding-left:65px;
+    margin-bottom:35px;
+}
+
+.phase-number{
+    position:absolute;
+    left:0;
+    top:0;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#635bff,#418fff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    z-index:2;
+}
+
+.phase-card{
+    background:#101728;
+    border:1px solid #29334c;
+    border-radius:16px;
+    padding:28px;
+}
+
+.phase-top{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.phase-label{
+    color:#78849e;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.phase-card h3{
+    margin-top:6px;
+    font-size:24px;
+}
+
+.phase-time{
+    background:#19223a;
+    border-radius:8px;
+    padding:8px 12px;
+    color:#aeb8ce;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.goal{
+    color:#929db5;
+    line-height:1.6;
+    margin:20px 0;
+}
+
+.data{
+    margin-top:23px;
+}
+
+.data h4{
+    margin-bottom:10px;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.chip{
+    padding:7px 10px;
+    background:#090e1a;
+    border:1px solid #303b56;
+    border-radius:7px;
+    color:#c2cbe0;
+    font-size:13px;
+}
+
+.data ul{
+    padding-left:20px;
+    color:#aab4ca;
+    line-height:1.8;
+}
+
+.milestone{
+    margin-top:25px;
+    padding:15px;
+    border-radius:10px;
+    background:rgba(99,91,255,.08);
+    border:1px solid rgba(99,91,255,.15);
+}
+
+.milestone strong{
+    color:#9b94ff;
+}
+
+.milestone p{
+    color:#aeb8ce;
+    margin-top:5px;
+}
+
+.week-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.day{
+    background:#090e1a;
+    border:1px solid #29334c;
+    padding:15px;
+    border-radius:10px;
+}
+
+.day strong{
+    color:#9e98ff;
+}
+
+.day p{
+    margin-top:8px;
+    color:#8d98b0;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.check-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.check{
+    padding:13px;
+    border-radius:9px;
+    background:#090e1a;
+    border:1px solid #29334c;
+    color:#b8c2d7;
+}
+
+.next-list{
+    padding-left:20px;
+    color:#aeb8ce;
+    line-height:2;
+}
+
+footer{
+    text-align:center;
+    color:#59657d;
+    padding:45px 20px;
+    border-top:1px solid #1c2436;
+}
+
+/* MOBILE */
+
+@media(max-width:750px){
+
+    .navbar{
+        padding:0 20px;
+    }
+
+    .ai-badge{
+        display:none;
+    }
+
+    .hero{
+        margin-top:50px;
+    }
+
+    .hero h1{
+        letter-spacing:-2px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:auto;
+    }
+
+    .roadmap-header{
+        flex-direction:column;
+    }
+
+    .week-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .check-grid{
+        grid-template-columns:1fr;
+    }
+
+    .phase-top{
+        flex-direction:column;
+    }
+
+    .phase{
+        padding-left:55px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🚀
+        </div>
+
+        CareerAI
+
+    </div>
+
+    <div class="ai-badge">
+        ✨ AI Career Engine
+    </div>
+
+</nav>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-badge">
+        ✨ PERSONALIZED CAREER INTELLIGENCE
+    </div>
+
+    <h1>
+        Build Your Path to
+        <span class="gradient">
+            Your Dream Career.
+        </span>
+    </h1>
+
+    <p>
+        Tell CareerAI where you want to go.
+        Our intelligent roadmap engine creates a personalized
+        journey with skills, projects, certifications,
+        milestones and job opportunities.
+    </p>
+
+</section>
+
+
+<div class="container">
+
+<!-- INPUT -->
+
+<section class="input-card">
+
+    <div class="card-title">
+
+        <div class="card-title-icon">
+            🎯
+        </div>
+
+        <div>
+
+            <h2>
+                Define Your Career Goal
+            </h2>
+
+            <p>
+                Give the AI enough information to build your roadmap.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+        <div class="form-group full">
+
+            <label>
+                DREAM JOB
+            </label>
+
+            <input
+                id="dreamJob"
+                value="Cybersecurity SOC Analyst"
+                placeholder="Example: Cybersecurity SOC Analyst"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                CURRENT LEVEL
+            </label>
+
+            <input
+                id="currentLevel"
+                value="BCA 1st year beginner"
+                placeholder="Example: BCA 1st year beginner"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                HOURS PER WEEK
+            </label>
+
+            <select id="hours">
+
+                <option value="5">
+                    5 hours
+                </option>
+
+                <option value="10" selected>
+                    10 hours
+                </option>
+
+                <option value="15">
+                    15 hours
+                </option>
+
+                <option value="20">
+                    20 hours
+                </option>
+
+                <option value="25">
+                    25+ hours
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group full">
+
+            <label>
+                INTERESTS
+            </label>
+
+            <textarea
+                id="interests"
+                rows="3"
+                placeholder="Example: Linux, networking, cloud security..."
+            >Cybersecurity, Linux, networking and ethical security</textarea>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="generate"
+        onclick="generateRoadmap()"
+    >
+        ✨ Generate AI Roadmap
+    </button>
+
+
+    <div
+        class="loading"
+        id="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <p>
+            AI is analyzing your career goal...
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ROADMAP -->
+
+<section id="roadmap">
+
+    <div class="roadmap-header">
+
+        <div>
+
+            <div class="ai-label">
+                ✨ AI GENERATED ROADMAP
+            </div>
+
+            <h2 id="careerTitle">
+                Cybersecurity SOC Analyst
+            </h2>
+
+            <p id="summary">
+                Personalized roadmap generated for your career goal.
+            </p>
+
+        </div>
+
+
+        <div class="duration">
+
+            <small>
+                ESTIMATED JOURNEY
+            </small>
+
+            <strong id="months">
+                12 Months
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- ROLES -->
+
+    <div class="section">
+
+        <h3>
+            💼 Possible Entry-Level Roles
+        </h3>
+
+        <div
+            class="roles"
+            id="roles"
+        ></div>
+
+    </div>
+
+
+    <!-- TIMELINE -->
+
+    <div
+        class="timeline"
+        id="timeline"
+    ></div>
+
+
+    <!-- WEEKLY PLAN -->
+
+    <div class="section">
+
+        <h3>
+            📅 Weekly Learning Plan
+        </h3>
+
+        <div
+            class="week-grid"
+            id="week"
+        ></div>
+
+    </div>
+
+
+    <!-- FINAL CHECKLIST -->
+
+    <div class="section">
+
+        <h3>
+            🏁 Final Career Checklist
+        </h3>
+
+        <div
+            class="check-grid"
+            id="checklist"
+        ></div>
+
+    </div>
+
+
+    <!-- NEXT STEPS -->
+
+    <div class="section">
+
+        <h3>
+            🚀 Recommended Next Steps
+        </h3>
+
+        <ol
+            class="next-list"
+            id="nextSteps"
+        ></ol>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<footer>
+
+    🚀 CareerAI
+    •
+    AI-powered personalized career planning
+
+</footer>
+
+
+<script>
+
+/*
+====================================================
+CAREERAI ROADMAP ENGINE
+Single-file frontend prototype
+====================================================
+*/
+
+function generateRoadmap(){
+
+    const dreamJob =
+        document.getElementById("dreamJob").value;
+
+    const currentLevel =
+        document.getElementById("currentLevel").value;
+
+    const hours =
+        document.getElementById("hours").value;
+
+    const interests =
+        document.getElementById("interests").value;
+
+
+    if(!dreamJob){
+
+        alert("Please enter your dream job.");
+
+        return;
+
+    }
+
+
+    document.getElementById("loading").style.display="block";
+
+    document.getElementById("roadmap").style.display="none";
+
+
+    setTimeout(()=>{
+
+        createRoadmap(
+            dreamJob,
+            currentLevel,
+            hours,
+            interests
+        );
+
+        document.getElementById("loading").style.display="none";
+
+        document.getElementById("roadmap").style.display="block";
+
+        document
+            .getElementById("roadmap")
+            .scrollIntoView({
+                behavior:"smooth"
+            });
+
+    },1500);
+
+}
+
+
+/*
+====================================================
+ROADMAP GENERATOR
+====================================================
+*/
+
+function createRoadmap(
+    dreamJob,
+    currentLevel,
+    hours,
+    interests
+){
+
+    document.getElementById("careerTitle")
+        .textContent=dreamJob;
+
+
+    document.getElementById("summary")
+        .textContent=
+        `Personalized ${hours}-hours-per-week roadmap for a ${currentLevel} student interested in ${interests}.`;
+
+
+    document.getElementById("months")
+        .textContent="12 Months";
+
+
+    /*
+    ENTRY ROLES
+    */
+
+    const roles=[
+
+        "Intern",
+        "Trainee",
+        "Junior Analyst",
+        "Associate",
+        "Entry-Level Specialist"
+
+    ];
+
+
+    document.getElementById("roles").innerHTML=
+
+        roles.map(role=>`
+
+            <div class="role">
+                ✓ ${role}
+            </div>
+
+        `).join("");
+
+
+    /*
+    PHASES
+    */
+
+    const phases=[
+
+        {
+
+            title:"Foundation & Orientation",
+
+            duration:"Month 1–2",
+
+            goal:
+            "Build the fundamental knowledge required for your target career.",
+
+            skills:[
+                "Computer Fundamentals",
+                "Operating Systems",
+                "Internet Basics",
+                "Problem Solving",
+                "Command Line"
+            ],
+
+            tools:[
+                "VS Code",
+                "Linux",
+                "Git",
+                "GitHub"
+            ],
+
+            projects:[
+                "Personal learning dashboard",
+                "Linux command practice",
+                "GitHub beginner repository"
+            ],
+
+            certifications:[
+                "Beginner IT fundamentals course",
+                "Linux fundamentals certificate"
+            ],
+
+            interviews:[
+                "Explain the basics of an operating system.",
+                "What is the command line?",
+                "What is Git and why is it useful?"
+            ],
+
+            milestone:
+            "You can confidently use your computer, terminal and GitHub."
+
+        },
+
+
+        {
+
+            title:"Core Technical Skills",
+
+            duration:"Month 3–5",
+
+            goal:
+            "Develop the technical skills directly connected to your dream job.",
+
+            skills:[
+                "Networking",
+                "TCP/IP",
+                "DNS",
+                "HTTP/HTTPS",
+                "Linux",
+                "Python Basics"
+            ],
+
+            tools:[
+                "Wireshark",
+                "Linux Terminal",
+                "Python",
+                "GitHub"
+            ],
+
+            projects:[
+                "Network analysis project",
+                "Python automation script",
+                "Linux security practice lab"
+            ],
+
+            certifications:[
+                "Networking fundamentals",
+                "Entry-level cybersecurity certification"
+            ],
+
+            interviews:[
+                "What is TCP/IP?",
+                "Difference between HTTP and HTTPS?",
+                "What is DNS?",
+                "Explain Linux permissions."
+            ],
+
+            milestone:
+            "You can explain and practically use the major technical concepts."
+
+        },
+
+
+        {
+
+            title:"Specialization",
+
+            duration:"Month 6–8",
+
+            goal:
+            "Focus deeply on the technologies and workflows used in your target role.",
+
+            skills:[
+                "Security Monitoring",
+                "Log Analysis",
+                "Threat Detection",
+                "Incident Response",
+                "Vulnerability Basics",
+                "Security Tools"
+            ],
+
+            tools:[
+                "SIEM",
+                "Wireshark",
+                "Linux",
+                "Security Labs"
+            ],
+
+            projects:[
+                "Mini SOC monitoring dashboard",
+                "Security log analysis project",
+                "Threat detection case study"
+            ],
+
+            certifications:[
+                "Security+ preparation",
+                "SOC analyst learning path"
+            ],
+
+            interviews:[
+                "What is a SIEM?",
+                "What is incident response?",
+                "How would you investigate a suspicious login?",
+                "What is vulnerability management?"
+            ],
+
+            milestone:
+            "You can analyze basic security events and explain your findings."
+
+        },
+
+
+        {
+
+            title:"Portfolio & Real Projects",
+
+            duration:"Month 9–10",
+
+            goal:
+            "Convert your knowledge into projects that demonstrate practical ability.",
+
+            skills:[
+                "Project Development",
+                "Documentation",
+                "Technical Writing",
+                "Problem Solving",
+                "Presentation"
+            ],
+
+            tools:[
+                "GitHub",
+                "VS Code",
+                "Linux",
+                "Documentation Tools"
+            ],
+
+            projects:[
+                "Complete cybersecurity portfolio project",
+                "Publish projects on GitHub",
+                "Create technical project documentation"
+            ],
+
+            certifications:[
+                "Complete one relevant certification"
+            ],
+
+            interviews:[
+                "Explain your strongest project.",
+                "What problem did your project solve?",
+                "What would you improve?"
+            ],
+
+            milestone:
+            "You have a public portfolio containing practical projects."
+
+        },
+
+
+        {
+
+            title:"Internship & Job Preparation",
+
+            duration:"Month 11–12",
+
+            goal:
+            "Prepare for internships and entry-level opportunities.",
+
+            skills:[
+                "Resume Building",
+                "Interview Skills",
+                "Communication",
+                "Aptitude",
+                "Technical Interview"
+            ],
+
+            tools:[
+                "LinkedIn",
+                "GitHub",
+                "Resume Builder",
+                "Job Portals"
+            ],
+
+            projects:[
+                "Final portfolio review",
+                "Mock technical interview",
+                "Mock HR interview"
+            ],
+
+            certifications:[
+                "Review completed certifications"
+            ],
+
+            interviews:[
+                "Tell me about yourself.",
+                "Why did you choose this career?",
+                "Explain one technical project.",
+                "What are your strengths?"
+            ],
+
+            milestone:
+            "You are ready to apply for internships and entry-level roles."
+
+        }
+
+    ];
+
+
+    const timeline =
+        document.getElementById("timeline");
+
+
+    timeline.innerHTML="";
+
+
+    phases.forEach((phase,index)=>{
+
+        timeline.innerHTML+=`
+
+        <div class="phase">
+
+            <div class="phase-number">
+                ${index+1}
+            </div>
+
+            <div class="phase-card">
+
+                <div class="phase-top">
+
+                    <div>
+
+                        <div class="phase-label">
+                            PHASE ${index+1}
+                        </div>
+
+                        <h3>
+                            ${phase.title}
+                        </h3>
+
+                    </div>
+
+                    <div class="phase-time">
+                        ⏱ ${phase.duration}
+                    </div>
+
+                </div>
+
+
+                <p class="goal">
+                    ${phase.goal}
+                </p>
+
+
+                <div class="data">
+
+                    <h4>
+                        💡 Skills
+                    </h4>
+
+                    <div class="chips">
+
+                        ${phase.skills.map(skill=>`
+
+                            <span class="chip">
+                                ${skill}
+                            </span>
+
+                        `).join("")}
+
+                    </div>
+
+                </div>
+
+
+                <div class="data">
+
+                    <h4>
+                        🛠️ Tools
+                    </h4>
+
+                    <div class="chips">
+
+                        ${phase.tools.map(tool=>`
+
+                            <span class="chip">
+                                ${tool}
+                            </span>
+
+                        `).join("")}
+
+                    </div>
+
+                </div>
+
+
+                <div class="data">
+
+                    <h4>
+                        🚀 Projects
+                    </h4>
+
+                    <ul>
+
+                        ${phase.projects.map(project=>`
+
+                            <li>
+                                ${project}
+                            </li>
+
+                        `).join("")}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="data">
+
+                    <h4>
+                        🏆 Certifications
+                    </h4>
+
+                    <ul>
+
+                        ${phase.certifications.map(cert=>`
+
+                            <li>
+                                ${cert}
+                            </li>
+
+                        `).join("")}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="data">
+
+                    <h4>
+                        💬 Interview Questions
+                    </h4>
+
+                    <ul>
+
+                        ${phase.interviews.map(question=>`
+
+                            <li>
+                                ${question}
+                            </li>
+
+                        `).join("")}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="milestone">
+
+                    <strong>
+                        ✓ Milestone
+                    </strong>
+
+                    <p>
+                        ${phase.milestone}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    /*
+    WEEKLY PLAN
+    */
+
+    const week={
+
+        Monday:"Learn core concepts",
+
+        Tuesday:"Watch lessons + take notes",
+
+        Wednesday:"Hands-on practice",
+
+        Thursday:"Build a mini project",
+
+        Friday:"Revision + interview questions",
+
+        Saturday:"Long practical session",
+
+        Sunday:"Review progress + plan next week"
+
+    };
+
+
+    document.getElementById("week").innerHTML=
+
+        Object.entries(week).map(
+            ([day,task])=>`
+
+            <div class="day">
+
+                <strong>
+                    ${day}
+                </strong>
+
+                <p>
+                    ${task}
+                </p>
+
+            </div>
+
+        `).join("");
+
+
+    /*
+    CHECKLIST
+    */
+
+    const checklist=[
+
+        "Learn technical fundamentals",
+        "Build at least 3 practical projects",
+        "Create GitHub portfolio",
+        "Complete relevant certification",
+        "Practice technical interviews",
+        "Prepare professional resume",
+        "Improve communication skills",
+        "Apply for internships",
+        "Complete mock interviews",
+        "Maintain consistent learning schedule"
+
+    ];
+
+
+    document.getElementById("checklist").innerHTML=
+
+        checklist.map(item=>`
+
+            <div class="check">
+                ✓ ${item}
+            </div>
+
+        `).join("");
+
+
+    /*
+    NEXT STEPS
+    */
+
+    const nextSteps=[
+
+        `Start learning the fundamentals related to ${dreamJob}.`,
+
+        "Create a GitHub account and document your learning.",
+
+        "Build your first small practical project.",
+
+        "Learn one new technical tool every few weeks.",
+
+        "Start solving beginner interview questions.",
+
+        "Build a portfolio before applying for internships.",
+
+        "Apply for beginner-friendly internships and trainee roles."
+
+    ];
+
+
+    document.getElementById("nextSteps").innerHTML=
+
+        nextSteps.map(step=>`
+
+            <li>
+                ${step}
+            </li>
+
+        `).join("");
+
+}
+
+</script>
+
+</body>
+</html> now add ai into this like ai also work
